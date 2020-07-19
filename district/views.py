@@ -1,15 +1,17 @@
 from django.http  import HttpResponse
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 import datetime as dt
 from django.http  import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
 from .forms import *
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
 
 
 # Create your views here.
+@login_required
 def index(request):
     return render(request, 'index.html')
 
@@ -28,11 +30,9 @@ def register(request):
 
             user_profile = UserProfile()
             user_profile.user = user
-            # user_profile.save()
             user_profile.save()
             registered = True
-            
-
+        
             return HttpResponseRedirect(reverse("user_login"))
 
         else:
@@ -77,10 +77,12 @@ def user_logout(request):
 def profile(request, id):
     user = User.objects.get(id=id)
     profile = UserProfile.objects.get(user_id=user)
-    sites = Site.objects.filter(profile__id=id)[::-1]
+    hoods = NeighbourHood.objects.filter(profile__id=id)[::-1]
     return render(request, "websites/profile.html", context={"user":user,
                                                              "profile":profile,
-                                                             "sites":sites})
+                                                            "hoods":hoods})
+
+#Create Profile View
 @login_required(login_url='/accounts/login/')
 def create_profile(request):
     current_user_id = request.user.id
@@ -103,7 +105,7 @@ def create_profile(request):
     return render(request, 'create-profile.html', {"form": form})
 
 
-
+#user profile view
 @login_required(login_url='/accounts/login/')
 def my_profile(request):
     current_user_id = request.user.id
@@ -113,7 +115,105 @@ def my_profile(request):
         profile = UserProfile.objects.get(user_id=current_user_id)
     except UserProfile.DoesNotExist:
         return redirect(create_profile)
-    site = Site.objects.filter(developer_id=current_user_id)
+    hood = NeighbourHood.objects.filter(admin_id=current_user_id)
     
 
-    return render(request, 'my-profile.html', { "site": site, "user_profile": user_profile},)
+    return render(request, 'my-profile.html', { "hood": hood, "user_profile": user_profile},)
+
+
+###################################################################
+
+def hoods(request):
+    all_hoods = NeighbourHood.objects.all()
+    all_hoods = all_hoods[::-1]
+    params = {
+        'all_hoods': all_hoods,
+    }
+    return render(request, 'all_hoods.html', params)
+
+
+def create_hood(request):
+    if request.method == 'POST':
+        form = NeighbourHoodForm(request.POST, request.FILES)
+        if form.is_valid():
+            hood = form.save(commit=False)
+            hood.admin = request.user.profile
+            hood.save()
+            return redirect('hood')
+    else:
+        form = NeighbourHoodForm()
+    return render(request, 'newhood.html', {'form': form})
+
+
+def single_hood(request, hood_id):
+    hood = NeighbourHood.objects.get(id=hood_id)
+    business = Business.objects.filter(neighbourhood=hood)
+    posts = Post.objects.filter(hood=hood)
+    posts = posts[::-1]
+    if request.method == 'POST':
+        form = BusinessForm(request.POST)
+        if form.is_valid():
+            b_form = form.save(commit=False)
+            b_form.neighbourhood = hood
+            b_form.user = request.user.profile
+            b_form.save()
+            return redirect('single-hood', hood.id)
+    else:
+        form = BusinessForm()
+    params = {
+        'hood': hood,
+        'business': business,
+        'form': form,
+        'posts': posts
+    }
+    return render(request, 'single_hood.html', params)
+
+
+def hood_members(request, hood_id):
+    hood = NeighbourHood.objects.get(id=hood_id)
+    members = Profile.objects.filter(neighbourhood=hood)
+    return render(request, 'members.html', {'members': members})
+
+
+def create_post(request, hood_id):
+    hood = NeighbourHood.objects.get(id=hood_id)
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.hood = hood
+            post.user = request.user.profile
+            post.save()
+            return redirect('single-hood', hood.id)
+    else:
+        form = PostForm()
+    return render(request, 'post.html', {'form': form})
+
+
+def join_hood(request, id):
+    neighbourhood = get_object_or_404(NeighbourHood, id=id)
+    request.user.profile.neighbourhood = neighbourhood
+    request.user.profile.save()
+    return redirect('hood')
+
+
+def leave_hood(request, id):
+    hood = get_object_or_404(NeighbourHood, id=id)
+    request.user.profile.neighbourhood = None
+    request.user.profile.save()
+    return redirect('hood')
+
+def search_business(request):
+    if request.method == 'GET':
+        name = request.GET.get("title")
+        results = Business.objects.filter(name__icontains=name).all()
+        print(results)
+        message = f'name'
+        params = {
+            'results': results,
+            'message': message
+        }
+        return render(request, 'results.html', params)
+    else:
+        message = "You haven't searched for any image category"
+    return render(request, "results.html")
