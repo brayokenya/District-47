@@ -1,3 +1,14 @@
-{%extends 'all-47/base.html'%} {% load bootstrap4 %}
+{%extends 'all-47/base.html'%}  {% block content %} {{block.super}}
 
-<h1> Welcome District-47</h1>
+<div class="container" >
+    <div class="text-white text-center" style="margin-top:15%">
+        <h1>Welcome to District-47 </h1>
+        <h5 style="margin-top:6%">Get Started by joining a hood today</h5>
+        <a href="{% url 'hood' %}" class="btn btn-sm btn-info mt-4">Join Hood</a>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{
