@@ -25,6 +25,7 @@ from district.views import *
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
+router = routers.DefaultRouter()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,6 +36,7 @@ urlpatterns = [
     url('accounts/', include('django.contrib.auth.urls')),
     url("logout/", auth_views.LogoutView.as_view()),
     url(r'^tinymce/', include('tinymce.urls')),
+    url(r'', include(router.urls)),
         
     
 
