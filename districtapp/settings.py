@@ -11,13 +11,20 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import cloudinary
+import dj_database_url 
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'f7u!*g3l!qrfh8a(0jx(mbjn3y_y0fl_1#e%lmr)kfp71r)l**'
@@ -40,10 +47,20 @@ INSTALLED_APPS = [
     'district',
     'bootstrap4',
     'cloudinary',
+    'django_registration',
+    'tinymce',
+    'crispy_forms',
 ]
+cloudinary.config (
+    cloud_name = 'dirmp3b0n',
+    api_key = '188189335364156',
+    api_secret = '9W11FSQ9FxxMmaJ9CGlRphprZlQ',
+
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -127,3 +144,40 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# configuring the location for media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+prod_db  =  dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(prod_db)
+# Configure Django App for Heroku.
+# django_heroku.settings(locals())
+
+LOGIN_URL = "/accounts/login/" # this is the name of the url
+LOGOUT_REDIRECT_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
+REGISTRATION_OPEN= True
+ACCOUNT_ACTIVATION_DAYS = 5
+
+import logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), #DJANGO DEBUG LEVEL
+        },
+    },
+}
