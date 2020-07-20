@@ -1,3 +1,4 @@
+[![codebeat badge](https://codebeat.co/badges/26bba316-7c0e-4350-aa1f-6c177983e5f1)](https://codebeat.co/projects/github-com-brayokenya-district-47-master)
 
 # District-47
 
