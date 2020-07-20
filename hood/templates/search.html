@@ -1,0 +1,35 @@
+{%extends 'base.html'%}
+{% block content %}
+<div class="container">
+    {% if businesses %}
+    <h4>Found {{ businesses|length }} businesses of searched {{ message }}</h4>
+    {% else %}
+    <h4>Found 0 businesses of searched {{ message }}</h4>
+    {% endif %}
+    <div class="row">
+        {% if businesses %}
+        {% for biz in businesses %}
+        <div class="col-md-4">
+            <div class="card card-default">
+                <div class="card-header">
+                    <h5>{{biz.name}}</h5>
+                </div>
+                <div class="card-title">
+                    <img src="{{biz.image.url}}" width="100%" class="img-responsive" alt="searched image">
+                </div>
+                <div class="card-footer">
+                    <h5>Address: {{biz.address}}<br>Owner:{{biz.owner}}
+                        <br>Joined: {{biz.create_date|timesince}}
+                        <br>Hood: {{biz.hood}}
+                    </h5>
+                    <h5>{{biz.details}}</h5>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <h4>There are no posts for this business.</h4>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
