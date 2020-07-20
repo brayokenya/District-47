@@ -1,7 +1,7 @@
 
 # District-47
 
-#### A Django District-47 clone
+#### Django District-47 
 
 ## User Story
 Sign in with the application to start using.
