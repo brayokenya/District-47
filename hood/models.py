@@ -35,8 +35,19 @@ class Profile(models.Model):
     join_date = models.DateTimeField(auto_now_add=True)
     hood = models.ForeignKey(Hood, on_delete=models.CASCADE, blank=True, null=True)
 
+  
     def __str__(self):
-        return f'{self.user.username} Profile'
+        return self.user.first_name
+
+    def save_profile(self):
+        self.save()
+
+    def delete_profile(self):
+        self.delete()
+
+    def update_bio(self, bio):
+        self.bio = bio
+        self.save()
 
 
 class Business(models.Model):
