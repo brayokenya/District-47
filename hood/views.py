@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 @login_required(login_url='/login')
 def index(request):
-    title = "Neighbourhood"
+    title = "District-47"
     user = Profile.objects.get(user=request.user.id)
     business = Business.objects.all().filter(hood=user.hood)
     context = {
