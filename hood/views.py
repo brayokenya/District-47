@@ -8,10 +8,10 @@ from django.contrib.auth.decorators import login_required
 def index(request):
     title = "District-47"
     user = Profile.objects.get(user=request.user.id)
-    business = Business.objects.all().filter(hood=user.hood)
+    residence = Hood.objects.all().filter(hood=user.hood)
     context = {
         "title": title,
-        "business": business
+        "residence": residence
     }
     return render(request, 'index.html', context)
 

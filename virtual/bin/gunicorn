@@ -1,4 +1,6 @@
-#!/Users/briankiiru/Desktop/E-Hood-master/virtual/bin/python
+#!/bin/sh
+'''exec' "/Users/briankiiru/Desktop/things/Django Projects/District-47/virtual/bin/python" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys
